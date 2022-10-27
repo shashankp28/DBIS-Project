@@ -11,7 +11,7 @@ load_dotenv()
 def create_token(email_id):
     exp = 3600 * float(os.getenv("TOKEN_EXP"))
     encoded = jwt.encode({"email_id": email_id, "exp": int(time())+exp}, os.getenv("PRIVATE_KEY"), algorithm="HS256")
-    token = Token(**{"access_token": encoded, "token_type": "bearer"})
+    token = Token(**{"access_token": encoded, "token_type": "Bearer"})
     return token
 
 def verify_credentials(email_id, password):
@@ -118,7 +118,9 @@ def decode_jwt(request: Request):
     token = request.headers.get('Authorization')
     try:
         assert token
-        payload = jwt.decode(token, os.getenv("PRIVATE_KEY"), algorithms=["RS256"])
+        tokens = token.split()
+        assert tokens[0]=="Bearer"
+        payload = jwt.decode(tokens[1], os.getenv("PRIVATE_KEY"), algorithms=["HS256"])
         email_id = payload["email_id"]
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
@@ -141,7 +143,9 @@ def delete_profile(email_id):
 def check_admin(email_id):
     try:
         parts = email_id.split('@')
-        assert parts[1]=='company.com'
+        assert parts[0]=='admin'
+        assert parts[1]=='comapany.com'
+        assert len(parts)==2
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Un-Authorized")
     return
@@ -154,4 +158,14 @@ def add_intern(intern: Intern):
         conn.commit()
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add intern")
+    return
+
+def add_employee(employee: Employee):
+    company = conn.cursor()
+    values = list(employee.dict().values())
+    try:
+        company.execute("insert into employee values(%s, %s)", values)
+        conn.commit()
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add employee")
     return

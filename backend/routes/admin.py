@@ -8,17 +8,15 @@ load_dotenv()
 router = APIRouter()
 
 
-@router.post("/intern", tags=["Admin"], response_model=Token)
+@router.post("/intern", tags=["Admin"])
 async def login(intern: Intern, email_id: str = Depends(decode_jwt)):
     check_admin(email_id)
     add_intern(intern)
-    return create_token(email_id)
+    return {"message": "Intern Added Successfully"}
 
 
-@router.post("/register", tags=["Admin"], response_model=Token)
-async def register(register: Register):
-    if register.password!=register.confirm_password:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match")
-    check_user_exists(register.email_id)
-    add_new_user(register.email_id, register.password)
-    return create_token(register.email_id)
+@router.post("/employee", tags=["Admin"])
+async def register(employee: Employee, email_id: str = Depends(decode_jwt)):
+    check_admin(email_id)
+    add_employee(employee)
+    return {"message": "Employee Added Successfully"}

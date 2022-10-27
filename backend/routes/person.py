@@ -7,6 +7,15 @@ load_dotenv()
 
 router = APIRouter()
 
+@router.post("/uploadfile", tags=["Person"])
+async def add_profile(file: UploadFile = File(...)):
+    try:
+        contents = file.file.read()
+        with open(file.filename, 'wb') as f:
+            f.write(contents)
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File Error")
+    return {"meassge": "File Upload Success"}
 
 @router.post("/profile", tags=["Person"])
 async def add_profile(profile: Profile, file: UploadFile = File(...), email_id: str = Depends(decode_jwt)):

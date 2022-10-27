@@ -24,7 +24,6 @@ class Register(BaseModel):
     confirm_password: str
 
 class Profile(BaseModel):
-    phone = str
     first_name: str
     middle_name: Optional[str] = None
     last_name: str
@@ -40,9 +39,14 @@ class Profile(BaseModel):
     uni_country: Optional[str] = None
     cpi: float
     passing_year: int
+    phone = str
 
 class Intern(BaseModel):
     email_id: str
     stipend: Optional[int] = None
     start_date: date
     expected_end_date: date
+
+class Employee(BaseModel):
+    email_id: str
+    salary: int
