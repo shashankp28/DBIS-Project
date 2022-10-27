@@ -31,7 +31,7 @@ create table project(
 );
 
 create table university(
-    id varchar(10) not null,
+    id int not null auto_increment,
     name varchar(100) not null,
     standing int check(standing > 0),
     city varchar(30) not null,
@@ -157,7 +157,7 @@ create table assigned_to(
 
 create table studies_at(
     email_id varchar(50) not null,
-    university_id varchar(10) not null,
+    university_id int not null,
     cpi decimal(10,2) not null,
     passing_year int not null check(passing_year>2000),
     primary key (email_id),
