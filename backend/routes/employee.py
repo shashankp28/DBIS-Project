@@ -24,21 +24,21 @@ async def delete_project_ep(project_id: str, load = Depends(decode_jwt)):
     delete_project(project_id)
     return {"meassge": "Project Deleted Successfully"}
 
-@router.post("/assign-project", tags=["Employee"])
+@router.post("/assign-intern-to-project", tags=["Employee"])
 async def assign_project_ep(project_assign: ProjectAssign, load = Depends(decode_jwt)):
     check_role(load, ["2"])
     mentor_id = load["email_id"]
     assign_project(project_assign, mentor_id)
     return {"meassge": "Project Added Successfully"}
 
-@router.delete("/unassign-project", tags=["Employee"])
+@router.delete("/unassign-intern-to-project", tags=["Employee"])
 async def unassign_project_ep(intern_id: str, load = Depends(decode_jwt)):
     check_role(load, ["2"])
     mentor_id = load["email_id"]
     unassign_project(intern_id, mentor_id)
     return {"message": "Project Un-Assigned Successfully"}
 
-@router.get("/assigned-projects", tags=["Employee"])
+@router.get("/assigned-interns-to-projects", tags=["Employee"])
 async def get_assigned_projects_ep(project_id: str, load = Depends(decode_jwt)):
     check_role(load, ["1", "2", "3"])
     return get_all_interns_under_project(project_id)
@@ -48,3 +48,9 @@ async def set_completed_ep(complete: Complete, load = Depends(decode_jwt)):
     check_role(load, ["2"])
     mentor_id = load["email_id"]
     return set_completed(complete, mentor_id)
+
+@router.get("/get-my-interns", tags=["Employee"])
+async def get_my_interns_ep(load = Depends(decode_jwt)):
+    check_role(load, ["1", "2"])
+    mentor_id = load["email_id"]
+    return get_my_interns(mentor_id)

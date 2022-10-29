@@ -51,9 +51,12 @@ async def delete_profile_ep(load = Depends(decode_jwt)):
 
 @router.get("/resume", tags=["Person"])
 async def get_resume_ep(path_to_resume, load=Depends(decode_jwt)):
-    check_role(load, ["1", "2", "3"])
     path = "resume/"+path_to_resume
     if os.path.exists(path):
         return FileResponse(path, media_type="application/pdf")
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resume Not Found")
+    
+@router.get("/mentor-by-student", tags=["Person"])
+async def get_mentor_by_student_ep(intern_id: str, load=Depends(decode_jwt)):
+    return get_mentor_by_student(intern_id)

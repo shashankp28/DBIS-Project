@@ -77,3 +77,4 @@ async def get_completed_info_ep(load: str = Depends(decode_jwt)):
 async def get_details_at_location_ep(location_id: str, load: str = Depends(decode_jwt)):
     check_role(load, ["1"])
     return get_details_at_location(location_id)
+

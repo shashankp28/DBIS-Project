@@ -34,7 +34,6 @@ def verify_credentials(email_id, password):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
     info = company.fetchone()
     if not info:
-        
         company.close()
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Email ID or Password")
     company.close()
@@ -263,6 +262,7 @@ def delete_profile(email_id):
 
 def set_location(email_id, location_id):
     company = conn.cursor()
+    err = False
     try: 
         try: company.execute("insert into at_location values(%s, %s)", [email_id, location_id])
         except Exception as e:
@@ -271,12 +271,13 @@ def set_location(email_id, location_id):
             except Exception as e: 
                 print(e) 
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
         conn.commit()
     except Exception as e:
         print(e) 
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
     company.close()
     return
 
@@ -289,6 +290,7 @@ def check_role(load, roles):
     return
 
 def add_intern(intern: Intern):
+    err = False
     company = conn.cursor()
     temp_dict = intern.dict()
     del temp_dict["location_id"]
@@ -304,16 +306,18 @@ def add_intern(intern: Intern):
             except Exception as e:
                 print(e) 
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
         conn.commit()
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add intern")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add intern")
     company.close()
     return
 
 def add_employee(employee: Employee):
+    err = False
     company = conn.cursor()
     temp_dict = employee.dict()
     del temp_dict["location_id"]
@@ -330,53 +334,57 @@ def add_employee(employee: Employee):
             except Exception as e:
                 print(e) 
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
         conn.commit()
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add employee")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add employee")
     company.close()
     return
 
 def delete_intern(email_id: str):
+    err = False
     company = conn.cursor()
     try:
+        unassign_roles(email_id)
         try: company.execute("delete from intern where email_id=%s", [email_id])
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
-        unassign_roles(email_id)
+            err = True
         conn.commit()
     except Exception as e:
         print(e)
-        
+        err = True
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to delete intern")
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to delete intern")
     company.close()
     return
 
 def delete_employee(email_id: str):
+    err = False
     company = conn.cursor()
     try:
         try: company.execute("delete from employee where email_id=%s", [email_id])
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+            err = True
         unassign_roles(email_id)
         conn.commit()
     except Exception as e:
         print(e)
-        
+        err = True
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to delete employee")
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to delete employee")
     company.close()
     return
 
 def assign_role(email_id, role_id):
     company = conn.cursor()
+    err = False
     try: 
         try: company.execute("insert into has_role values(%s, %s)", [email_id, role_id])
         except Exception as e:
@@ -385,12 +393,13 @@ def assign_role(email_id, role_id):
             except Exception as e:
                 print(e) 
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
         conn.commit()
     except Exception as e:
         print(e) 
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
     company.close()
     return
 
@@ -409,12 +418,13 @@ def unassign_roles(email_id):
 def get_interns():
     company = conn.cursor()
     data = []
+    err = False
     try:
         try: company.execute("select * from intern")
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+            err = True
         info = company.fetchall()
         for inf in info:
             details = get_profile(inf[0])
@@ -424,26 +434,28 @@ def get_interns():
             except Exception as e:
                 print(e) 
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
             temp_inf = company.fetchone()
             temp_data["assigned_to_mentor"] = temp_inf if not temp_inf else temp_inf[0]
             data.append(temp_data)
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get intern")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get intern")
     company.close()
     return data
 
 def get_employees():
     company = conn.cursor()
     data = []
+    err = False
     try:
         try: company.execute("select * from employee")
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+            err = True
         info = company.fetchall()
         for inf in info:
             details = get_profile(inf[0])
@@ -453,17 +465,19 @@ def get_employees():
             except Exception as e:
                 print(e) 
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
             temp_data["mentor_is_assigned"] = list(company.fetchall())
             data.append(temp_data)
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get employy")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get employy")
     company.close()
     return data
 
 def unassigned(which):
+    err = False
     company = conn.cursor()
     data = []
     try:
@@ -476,17 +490,19 @@ def unassigned(which):
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+            err = True
         info = company.fetchall()
         for inf in info: data.append(get_profile(inf[0]))
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get data")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get data")
     company.close()
     return data
 
 def assign_mentor(assign: Assign):
+    err = False
     company = conn.cursor()
     values = [assign.intern_id, assign.mentor_id]
     try:
@@ -496,16 +512,18 @@ def assign_mentor(assign: Assign):
             try: company.execute("update is_mentor set intern_id=%s where mentor_id=%s", [values[1], values[0]])
             except:
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
         conn.commit()
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to assign mentor")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to assign mentor")
     company.close()
     return
 
 def unassign_mentor(email_id):
+    err = False
     company = conn.cursor()
     values = [email_id]
     try:
@@ -513,16 +531,18 @@ def unassign_mentor(email_id):
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+            err = True
         conn.commit()
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to unassign mentor")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to unassign mentor")
     company.close()
     return
 
 def get_mentor_data():
+    err = False
     company = conn.cursor()
     data = []
     try:
@@ -530,7 +550,7 @@ def get_mentor_data():
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+            err = True
         info = company.fetchall()
         for inf in info:
             temp_data = {"mentor_id": inf[0], "intern_id": inf[1]}
@@ -538,11 +558,13 @@ def get_mentor_data():
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get mentors")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get mentors")
     company.close()
     return data
 
 def add_project(project: Project):
+    err = False
     company = conn.cursor()
     values = [
         project.project_id,
@@ -559,16 +581,18 @@ def add_project(project: Project):
             except Exception as e:
                 print(e) 
                 company.close()
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
         conn.commit()
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add project")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to add project")
     company.close()
     return
 
 def get_project():
+    err = False
     company = conn.cursor()
     data = []
     try:
@@ -576,7 +600,7 @@ def get_project():
         except Exception as e:
             print(e) 
             company.close()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+            err = True
         info = company.fetchall()
         for inf in info:
             temp_data = {"project_id": inf[0], "topic": inf[1], "description": inf[2]}
@@ -584,7 +608,7 @@ def get_project():
     except Exception as e:
         print(e)
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get project")
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get project")
     company.close()
     return data
 
@@ -601,6 +625,7 @@ def delete_project(project_id):
     return
 
 def assign_project(project_assign: ProjectAssign, mentor_id: str):
+    err = False
     company = conn.cursor()
     values = [
         project_assign.intern_id,
@@ -622,12 +647,13 @@ def assign_project(project_assign: ProjectAssign, mentor_id: str):
                                  where email_id=%s""", values[1:]+[values[0]])
             except Exception as e:
                 print(e)
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+                err = True
         conn.commit()
     except Exception as e:
         print(e) 
         company.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to assign project")
+        err = True
+    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to assign project")
     company.close()
     return
 
@@ -639,7 +665,7 @@ def unassign_project(intern_id: str, mentor_id: str):
                         where mentor_id=%s and intern_id=%s""", [mentor_id, intern_id])
         info = company.fetchone()
         assert info is not None
-        company.execute("delete from assigned_to where intern_id=%s", intern_id)
+        company.execute("delete from assigned_to where email_id=%s", [intern_id])
         conn.commit()
     except Exception as e:
         print(e) 
@@ -732,3 +758,31 @@ def get_details_at_location(location_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get completed")
     company.close()
     return data
+
+def get_my_interns(mentor_id):
+    company = conn.cursor()
+    data = []
+    try: 
+        company.execute("""select intern_id from is_mentor where mentor_id=%s""", [mentor_id])
+        info = company.fetchall()
+        for inf in info:
+            data.append(get_profile(inf[0]))
+    except Exception as e:
+        print(e) 
+        company.close()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to get my interns")
+    company.close()
+    return data
+
+def get_mentor_by_student(intern_id):
+    company = conn.cursor()
+    try: 
+        company.execute("""select mentor_id from is_mentor where intern_id=%s""", [intern_id])
+        info = company.fetchone()
+        assert info is not None
+    except Exception as e:
+        print(e) 
+        company.close()
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Failed to get mentor by student")
+    company.close()
+    return get_profile(info[0])
