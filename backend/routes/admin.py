@@ -62,11 +62,11 @@ async def assign_mentor_ep(assign: Assign, load: str = Depends(decode_jwt)):
     assign_mentor(assign)
     return {"message": "Mentor Assigned Successfully"}
 
-@router.delete("/mentor", tags=["Admin"])
-async def unassign_mentor_ep(emaiil_id: str, load: str = Depends(decode_jwt)):
-    check_role(load, ["1"])
-    unassign_mentor(emaiil_id)
-    return {"message": "Mentor Un-Assigned Successfully"}
+# @router.delete("/mentor", tags=["Admin"])
+# async def unassign_mentor_ep(email_id: str, load: str = Depends(decode_jwt)):
+#     check_role(load, ["1"])
+#     unassign_mentor(email_id)
+#     return {"message": "Mentor Un-Assigned Successfully"}
 
 @router.get("/completed", tags=["Admin"])
 async def get_completed_info_ep(load: str = Depends(decode_jwt)):

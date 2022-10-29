@@ -553,7 +553,21 @@ def get_mentor_data():
             err = True
         info = company.fetchall()
         for inf in info:
-            temp_data = {"mentor_id": inf[0], "intern_id": inf[1]}
+            temp_info_intern = get_profile(inf[0])
+            temp_info_mentor = get_profile(inf[1])
+            temp_data = {"intern": {
+                    "email_id": temp_info_intern["email_id"],
+                    "first_name": temp_info_intern["first_name"],
+                    "last_name": temp_info_intern["last_name"],
+                    "phone": temp_info_intern["phone"]
+                },
+                "mentor":{
+                    "email_id": temp_info_mentor["email_id"],
+                    "first_name": temp_info_mentor["first_name"],
+                    "last_name": temp_info_mentor["last_name"],
+                    "phone": temp_info_mentor["phone"]
+                } 
+            }
             data.append(temp_data)
     except Exception as e:
         print(e)
