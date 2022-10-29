@@ -420,7 +420,12 @@ def get_interns():
     data = []
     err = False
     try:
-        try: company.execute("select * from intern")
+        try: company.execute("""select * 
+                             from intern I
+                             where I.email_id not in (
+                                 select C.email_id
+                                 from is_completed C
+                                 )""")
         except Exception as e:
             print(e) 
             company.close()
@@ -730,6 +735,9 @@ def set_completed(complete: Complete, mentor_id: str):
         complete.performance_desc
     ]
     try: 
+        company.execute("select * from is_mentor where mentor_id=%s and intern_id=%s", [mentor_id, complete.intern_id])
+        info = company.fetchone()
+        assert info
         company.execute("""insert into is_completed
                         values(%s, %s, %s, %s)""", data)
         unassign_roles(complete.email_id)

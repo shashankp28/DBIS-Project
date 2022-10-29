@@ -68,7 +68,7 @@ async def assign_mentor_ep(assign: Assign, load: str = Depends(decode_jwt)):
 #     unassign_mentor(email_id)
 #     return {"message": "Mentor Un-Assigned Successfully"}
 
-@router.get("/completed", tags=["Admin"])
+@router.get("/completed-interns", tags=["Admin"])
 async def get_completed_info_ep(load: str = Depends(decode_jwt)):
     check_role(load, ["1"])
     return get_completed_info()

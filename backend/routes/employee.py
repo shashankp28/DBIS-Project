@@ -43,11 +43,12 @@ async def get_assigned_projects_ep(project_id: str, load = Depends(decode_jwt)):
     check_role(load, ["1", "2", "3"])
     return get_all_interns_under_project(project_id)
 
-@router.post("/completed", tags=["Employee"])
+@router.post("/intern-completed", tags=["Employee"])
 async def set_completed_ep(complete: Complete, load = Depends(decode_jwt)):
     check_role(load, ["2"])
     mentor_id = load["email_id"]
-    return set_completed(complete, mentor_id)
+    set_completed(complete, mentor_id)
+    return {"message": "Intern Completed Successfully"}
 
 @router.get("/get-my-interns", tags=["Employee"])
 async def get_my_interns_ep(load = Depends(decode_jwt)):
