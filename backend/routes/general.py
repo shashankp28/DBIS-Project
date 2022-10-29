@@ -26,3 +26,12 @@ async def register(register: Register):
     check_user_exists(register.email_id)
     add_new_user(register.email_id, register.password)
     return create_token(register.email_id)
+
+
+@router.get("/location", tags=["General"])
+async def get_locations_ep():
+    return get_locations()
+
+@router.get("/university", tags=["General"])
+async def all_universities():
+    return get_univeristies()

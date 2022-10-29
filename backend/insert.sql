@@ -20,3 +20,11 @@ insert into role values("1", "admin", "All Administrative Access."),
 
 
 insert into has_role values("admin@company.com", "1");
+insert into at_location values("admin@company.com", "1");
+insert into employee values("admin@company.com", 1000000);
+insert into studies_at values("admin@company.com", "2", 9.71, 2016);
+
+insert into location values("1", "Tech Park", "Banglore", "India"),
+                            ("2", "Silicon Valley", "San Fransisco", "USA"),
+                            ("3", "Golden bowl", "Beijing", "China"),
+                            ("4", "Heaven", "South Pole", "Antartica");

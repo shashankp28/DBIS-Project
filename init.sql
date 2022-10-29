@@ -26,7 +26,6 @@ create table project(
     project_id varchar(10) not null,
     topic varchar(100) not null,
     description varchar(1000) not null,
-    path_to_pdf varchar(200) not null,
     primary key (project_id)
 );
 
@@ -52,6 +51,7 @@ create table person(
     country varchar(25) not null,
     gender ENUM('male', 'female', 'others'),
     path_to_resume varchar(100) not null,
+    applied_for ENUM('intern', 'employee'),
     primary key (email_id),
     foreign key (email_id) references credentials(email_id) on delete cascade on update cascade
 );
@@ -92,7 +92,7 @@ create table is_mentor(
 create table has_role(
     email_id varchar(50) not null,
     role_id varchar(10) not null,
-    primary key (email_id, role_id),
+    primary key (email_id),
     foreign key (email_id) references person(email_id) on delete cascade on update cascade,
     foreign key (role_id) references role(id) on delete cascade on update cascade  
 );
@@ -130,9 +130,6 @@ create table is_completed(
 -- create table has_role(
 
 -- )
-
-
-
 
 create table at_location(
     email_id varchar(50) not null,
