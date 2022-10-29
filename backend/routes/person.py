@@ -57,6 +57,11 @@ async def get_resume_ep(path_to_resume, load=Depends(decode_jwt)):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resume Not Found")
     
+@router.get("/my-project", tags=["Person"])
+async def get_project_by_intern_id_ep(load=Depends(decode_jwt)):
+    check_role(load, ["3"])
+    return get_project_by_intern_id(load["email_id"])
+    
 @router.get("/mentor-by-student", tags=["Person"])
 async def get_mentor_by_student_ep(intern_id: str, load=Depends(decode_jwt)):
     return get_mentor_by_student(intern_id)

@@ -735,7 +735,7 @@ def set_completed(complete: Complete, mentor_id: str):
         complete.performance_desc
     ]
     try: 
-        company.execute("select * from is_mentor where mentor_id=%s and intern_id=%s", [mentor_id, complete.intern_id])
+        company.execute("select * from is_mentor where mentor_id=%s and intern_id=%s", [mentor_id, complete.email_id])
         info = company.fetchone()
         assert info
         company.execute("""insert into is_completed
@@ -785,7 +785,9 @@ def get_my_interns(mentor_id):
     company = conn.cursor()
     data = []
     try: 
-        company.execute("""select intern_id from is_mentor where mentor_id=%s""", [mentor_id])
+        company.execute("""select intern_id from is_mentor where mentor_id=%s and intern_id not in (
+            select email_id from is_completed
+            )""", [mentor_id])
         info = company.fetchall()
         for inf in info:
             data.append(get_profile(inf[0]))
@@ -808,3 +810,27 @@ def get_mentor_by_student(intern_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Failed to get mentor by student")
     company.close()
     return get_profile(info[0])
+
+def get_project_by_intern_id(email_id):
+    company = conn.cursor()
+    try: 
+        company.execute("""select * 
+                        from project P
+                        where P.project_id in (
+                            select distnct A.project_id
+                            from assigned_to A
+                            where A.email_id=%s
+                            )""", [email_id])
+        info = company.fetchone()
+        assert info is not None
+    except Exception as e:
+        print(e) 
+        company.close()
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Failed to get mentor by student")
+    company.close()
+    data = {
+        "project_id": info[0],
+        "topic": info[1],
+        "description": info[2]
+    }
+    return data
