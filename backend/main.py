@@ -1,4 +1,4 @@
-from routes import general, person, university
+from routes import general, person, university, admin
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -17,3 +17,4 @@ app.add_middleware(
 app.include_router(general.router)
 app.include_router(person.router)
 app.include_router(university.router)
+app.include_router(admin.router)

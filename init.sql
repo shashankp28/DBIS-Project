@@ -53,7 +53,7 @@ create table person(
     gender ENUM('male', 'female', 'others'),
     path_to_resume varchar(100) not null,
     primary key (email_id),
-    foreign key (email_id) references credentials(email_id)
+    foreign key (email_id) references credentials(email_id) on delete cascade on update cascade
 );
 
 create table employee(
@@ -62,7 +62,7 @@ create table employee(
     -- position varchar(30) not null,
     -- role_id varchar(10) not null,
     primary key (email_id),
-    foreign key (email_id) references person(email_id)
+    foreign key (email_id) references person(email_id) on delete cascade on update cascade
     -- foreign key role_id references role(id)
 );
 create table intern(
@@ -76,15 +76,15 @@ create table intern(
     -- current_status BOOLEAN not null,
     primary key (email_id),
     -- foreign key (mentor_id) references employee(email_id),
-    foreign key (email_id) references person(email_id)
+    foreign key (email_id) references person(email_id) on delete cascade on update cascade
     -- foreign key role_id references role(id)
 );
 create table is_mentor(
     intern_id varchar(50) not null,
     mentor_id varchar(50) not null,
     primary key (intern_id),
-    foreign key (intern_id) references intern(email_id),
-    foreign key (mentor_id) references employee(email_id)
+    foreign key (intern_id) references intern(email_id) on delete cascade on update cascade,
+    foreign key (mentor_id) references employee(email_id) on delete cascade on update cascade
 );
 
 
@@ -93,8 +93,8 @@ create table has_role(
     email_id varchar(50) not null,
     role_id varchar(10) not null,
     primary key (email_id, role_id),
-    foreign key (email_id) references person(email_id),
-    foreign key (role_id) references role(id)  
+    foreign key (email_id) references person(email_id) on delete cascade on update cascade,
+    foreign key (role_id) references role(id) on delete cascade on update cascade  
 );
 
 -- create table stage(
@@ -124,7 +124,7 @@ create table is_completed(
     score int not null check(score>=0 and score<=10),
     performance_desc varchar(1000),
     primary key (email_id),
-    foreign key (email_id) references intern(email_id)
+    foreign key (email_id) references intern(email_id) on delete cascade on update cascade
 );
 
 -- create table has_role(
@@ -138,8 +138,8 @@ create table at_location(
     email_id varchar(50) not null,
     location_id varchar(10) not null unique,
     primary key (email_id),
-    foreign key (email_id) references person(email_id),
-    foreign key (location_id) references location(location_id)
+    foreign key (email_id) references person(email_id) on delete cascade on update cascade,
+    foreign key (location_id) references location(location_id) on delete cascade on update cascade
 );
 
 
@@ -149,8 +149,8 @@ create table assigned_to(
     assigned_date date not null,
     end_date date,
     primary key (email_id),
-    foreign key (email_id) references intern(email_id),
-    foreign key (project_id) references project(project_id)
+    foreign key (email_id) references intern(email_id) on delete cascade on update cascade,
+    foreign key (project_id) references project(project_id) on delete cascade on update cascade
 );
 
 
@@ -161,8 +161,8 @@ create table studies_at(
     cpi decimal(10,2) not null,
     passing_year int not null check(passing_year>2000),
     primary key (email_id),
-    foreign key (email_id) references intern(email_id),
-    foreign key (university_id) references university(id)
+    foreign key (email_id) references person(email_id) on delete cascade on update cascade,
+    foreign key (university_id) references university(id) on delete cascade on update cascade
 );
 
 
