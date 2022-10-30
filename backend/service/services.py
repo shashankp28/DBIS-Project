@@ -134,7 +134,6 @@ def add_profile_to_db(email_id, profile: Profile, path_to_resume):
                         country=%s, gender=%s, path_to_resume=%s, applied_for=%s
                         where email_id=%s
                         """, values[1:]+[email_id])
-            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
@@ -192,7 +191,6 @@ def add_studies_at(email_id, university_id, cpi, passing_year):
                         SET university_id=%s, cpi=%s, passing_year=%s
                         where email_id=%s
                         """, values[1:]+[email_id])
-            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
@@ -286,7 +284,6 @@ def set_location(email_id, location_id):
             print(e) 
             try: 
                 company.execute("update at_location set location_id=%s where email_id=%s", [location_id, email_id])
-                assert company.rowcount
             except Exception as e: 
                 print(e) 
                 company.close()
@@ -327,7 +324,6 @@ def add_intern(intern: Intern):
                 company.execute("""update intern
                                  set stipend=%s, start_date=%s, end_date=%s
                                  where email_id=%s""", values[1:]+[values[0]])
-                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -359,7 +355,6 @@ def add_employee(employee: Employee):
                 company.execute("""update employee 
                                  set salary=%s
                                  where email_id=%s""", [employee.salary, employee.email_id])
-                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -428,7 +423,6 @@ def assign_role(email_id, role_id):
             print(e) 
             try: 
                 company.execute("update has_role set role_id=%s where email_id=%s", [role_id, email_id])
-                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -571,7 +565,6 @@ def assign_mentor(assign: Assign):
             print(e)
             try: 
                 company.execute("update is_mentor set intern_id=%s where mentor_id=%s", [values[1], values[0]])
-                assert company.rowcount
             except:
                 company.close()
                 err = True
@@ -652,7 +645,6 @@ def add_project(project: Project):
                 company.execute("""update project
                                  set topic=%s, description=%s
                                  where project_id=%s""", values[1:]+[values[0]])
-                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -724,7 +716,6 @@ def assign_project(project_assign: ProjectAssign, mentor_id: str):
                 company.execute("""update assigned_to
                                  set project_id=%s, assigned_date=%s, end_date=%s
                                  where email_id=%s""", values[1:]+[values[0]])
-                assert company.rowcount
             except Exception as e:
                 print(e)
                 err = True
