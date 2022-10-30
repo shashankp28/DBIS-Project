@@ -1,0 +1,18 @@
+{
+  "phone": "9483303320",
+  "first_name": "Shashank P",
+  "middle_name": "",
+  "last_name": "P",
+  "dob": "2002-03-28",
+  "address_first_line": "My House",
+  "address_second_line": "",
+  "zip_code": 574203,
+  "country": "India",
+  "gender": "male",
+  "university_id": 1,
+  "university_name": "IIT Goa",
+  "uni_city": "Goa",
+  "uni_country": "India",
+  "cpi": 9.71,
+  "passing_year": 2024
+}
