@@ -49,9 +49,9 @@ class Profile(BaseModel):
 class Intern(BaseModel):
     email_id: str
     stipend: Optional[int] = None
+    location_id: str
     start_date: date
     expected_end_date: date
-    location_id: str
 
 class Employee(BaseModel):
     email_id: str

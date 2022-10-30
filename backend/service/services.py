@@ -56,7 +56,9 @@ def check_user_exists(email_id):
 
 def add_new_user(email_id, password):
     company = conn.cursor()
-    try: company.execute("INSERT into credentials values(%s, %s)", [email_id, password])
+    try: 
+        company.execute("INSERT into credentials values(%s, %s)", [email_id, password])
+        assert company.rowcount
     except Exception as e:
         print(e) 
         company.close()
@@ -67,7 +69,9 @@ def add_new_user(email_id, password):
 
 def add_unversity(name, standing, city, country):
     company = conn.cursor()
-    try: company.execute("INSERT into university values(%s, %s, %s, %s)", [name, standing, city, country])
+    try: 
+        company.execute("INSERT into university values(%s, %s, %s, %s)", [name, standing, city, country])
+        assert company.rowcount
     except Exception as e:
         print(e) 
         company.close()
@@ -123,19 +127,23 @@ def add_profile_to_db(email_id, profile: Profile, path_to_resume):
     
     info = company.fetchone()
     if info:
-        try: company.execute("""UPDATE person
+        try: 
+            company.execute("""UPDATE person
                         SET phone=%s, first_name=%s, middle_name=%s, last_name=%s, 
                         dob=%s, address_first_line=%s, address_second_line=%s, zip_code=%s,
                         country=%s, gender=%s, path_to_resume=%s, applied_for=%s
                         where email_id=%s
                         """, values[1:]+[email_id])
+            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
         conn.commit()
     else:
-        try: company.execute("""INSERT into person values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", values)
+        try: 
+            company.execute("""INSERT into person values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", values)
+            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
@@ -147,7 +155,9 @@ def add_profile_to_db(email_id, profile: Profile, path_to_resume):
 def add_university(name, city, country):
     values = [name, None, city, country]
     company = conn.cursor(buffered=True)
-    try: company.execute("INSERT into university(name, standing, city, country) values(%s, %s, %s, %s)", values)
+    try: 
+        company.execute("INSERT into university(name, standing, city, country) values(%s, %s, %s, %s)", values)
+        assert company.rowcount
     except Exception as e:
         print(e) 
         company.close()
@@ -177,17 +187,21 @@ def add_studies_at(email_id, university_id, cpi, passing_year):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
     info = company.fetchone()
     if info:
-        try: company.execute("""UPDATE studies_at
+        try: 
+            company.execute("""UPDATE studies_at
                         SET university_id=%s, cpi=%s, passing_year=%s
                         where email_id=%s
                         """, values[1:]+[email_id])
+            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
         conn.commit()
     else:
-        try: company.execute("""INSERT into studies_at values(%s, %s, %s, %s)""", values)
+        try: 
+            company.execute("""INSERT into studies_at values(%s, %s, %s, %s)""", values)
+            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
@@ -252,6 +266,7 @@ def delete_profile(email_id):
     company = conn.cursor()
     try: 
         company.execute("delete from person where email_id=%s", [email_id])
+        assert company.rowcount
         conn.commit()
     except Exception as e:
         print(e) 
@@ -264,10 +279,14 @@ def set_location(email_id, location_id):
     company = conn.cursor()
     err = False
     try: 
-        try: company.execute("insert into at_location values(%s, %s)", [email_id, location_id])
+        try: 
+            company.execute("insert into at_location values(%s, %s)", [email_id, location_id])
+            assert company.rowcount
         except Exception as e:
             print(e) 
-            try: company.execute("update at_location set location_id=%s where email_id=%s", [location_id, email_id])
+            try: 
+                company.execute("update at_location set location_id=%s where email_id=%s", [location_id, email_id])
+                assert company.rowcount
             except Exception as e: 
                 print(e) 
                 company.close()
@@ -295,14 +314,20 @@ def add_intern(intern: Intern):
     temp_dict = intern.dict()
     del temp_dict["location_id"]
     values = list(temp_dict.values())
+    print(values)
     try:
         assign_role(intern.email_id, 3)
         set_location(intern.email_id, intern.location_id)
-        try: company.execute("insert into intern values(%s, %s, %s, %s)", values)
+        try: 
+            company.execute("insert into intern values(%s, %s, %s, %s)", values)
+            assert company.rowcount
         except Exception as e:
-            try: company.execute("""upadte intern
+            print(e)
+            try: 
+                company.execute("""update intern
                                  set stipend=%s, start_date=%s, end_date=%s
                                  where email_id=%s""", values[1:]+[values[0]])
+                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -325,12 +350,16 @@ def add_employee(employee: Employee):
     try:
         assign_role(employee.email_id, 2)
         set_location(employee.email_id, employee.location_id)
-        try: company.execute("insert into employee values(%s, %s)", values)
+        try: 
+            company.execute("insert into employee values(%s, %s)", values)
+            assert company.rowcount
         except Exception as e:
             print(e) 
-            try: company.execute("""update employee 
+            try: 
+                company.execute("""update employee 
                                  set salary=%s
                                  where email_id=%s""", [employee.salary, employee.email_id])
+                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -348,12 +377,15 @@ def delete_intern(email_id: str):
     err = False
     company = conn.cursor()
     try:
-        unassign_roles(email_id)
-        try: company.execute("delete from intern where email_id=%s", [email_id])
+        try: 
+            company.execute("delete from intern where email_id=%s", [email_id])
+            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
             err = True
+        unassign_roles(email_id)
+        remove_location(email_id)
         conn.commit()
     except Exception as e:
         print(e)
@@ -367,12 +399,15 @@ def delete_employee(email_id: str):
     err = False
     company = conn.cursor()
     try:
-        try: company.execute("delete from employee where email_id=%s", [email_id])
+        try: 
+            company.execute("delete from employee where email_id=%s", [email_id])
+            assert company.rowcount
         except Exception as e:
             print(e) 
             company.close()
             err = True
         unassign_roles(email_id)
+        remove_location(email_id)
         conn.commit()
     except Exception as e:
         print(e)
@@ -386,10 +421,14 @@ def assign_role(email_id, role_id):
     company = conn.cursor()
     err = False
     try: 
-        try: company.execute("insert into has_role values(%s, %s)", [email_id, role_id])
+        try: 
+            company.execute("insert into has_role values(%s, %s)", [email_id, role_id])
+            assert company.rowcount
         except Exception as e:
             print(e) 
-            try: company.execute("update has_role set role_id=%s where email_id=%s", [role_id, email_id])
+            try: 
+                company.execute("update has_role set role_id=%s where email_id=%s", [role_id, email_id])
+                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -407,11 +446,25 @@ def unassign_roles(email_id):
     company = conn.cursor()
     try: 
         company.execute("delete from has_role where email_id=%s", [email_id])
-        conn.commit()
+        assert company.rowcount
     except Exception as e:
         print(e) 
         company.close()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+    conn.commit()
+    company.close()
+    return
+
+def remove_location(email_id):
+    company = conn.cursor()
+    try: 
+        company.execute("delete from at_location where email_id=%s", [email_id])
+        assert company.rowcount
+    except Exception as e:
+        print(e) 
+        company.close()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+    conn.commit()
     company.close()
     return
 
@@ -511,10 +564,14 @@ def assign_mentor(assign: Assign):
     company = conn.cursor()
     values = [assign.intern_id, assign.mentor_id]
     try:
-        try: company.execute("insert into is_mentor values(%s, %s)", values)
+        try: 
+            company.execute("insert into is_mentor values(%s, %s)", values)
+            assert company.rowcount
         except Exception as e:
             print(e)
-            try: company.execute("update is_mentor set intern_id=%s where mentor_id=%s", [values[1], values[0]])
+            try: 
+                company.execute("update is_mentor set intern_id=%s where mentor_id=%s", [values[1], values[0]])
+                assert company.rowcount
             except:
                 company.close()
                 err = True
@@ -528,21 +585,16 @@ def assign_mentor(assign: Assign):
     return
 
 def unassign_mentor(email_id):
-    err = False
     company = conn.cursor()
     values = [email_id]
-    try:
-        try: company.execute("delete from is_mentor where mentor_id=%s", values)
-        except Exception as e:
-            print(e) 
-            company.close()
-            err = True
-        conn.commit()
+    try: 
+        company.execute("delete from is_mentor where mentor_id=%s", values)
+        assert company.rowcount
     except Exception as e:
-        print(e)
+        print(e) 
         company.close()
-        err = True
-    if err: raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to unassign mentor")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to unassign mentor")
+    conn.commit()
     company.close()
     return
 
@@ -591,12 +643,16 @@ def add_project(project: Project):
         project.description,
     ]
     try:
-        try: company.execute("insert into project values(%s, %s, %s)", values)
+        try: 
+            company.execute("insert into project values(%s, %s, %s)", values)
+            assert company.rowcount
         except Exception as e:
             print(e) 
-            try: company.execute("""update project
+            try: 
+                company.execute("""update project
                                  set topic=%s, description=%s
                                  where project_id=%s""", values[1:]+[values[0]])
+                assert company.rowcount
             except Exception as e:
                 print(e) 
                 company.close()
@@ -635,11 +691,12 @@ def delete_project(project_id):
     company = conn.cursor()
     try: 
         company.execute("delete from project where project_id=%s", [project_id])
-        conn.commit()
+        assert company.rowcount
     except Exception as e:
         print(e) 
         company.close()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database Error")
+    conn.commit()
     company.close()
     return
 
@@ -658,12 +715,16 @@ def assign_project(project_assign: ProjectAssign, mentor_id: str):
                         where mentor_id=%s and intern_id=%s""", [mentor_id, project_assign.intern_id])
         info = company.fetchone()
         assert info is not None
-        try: company.execute("insert into assigned_to value(%s, %s, %s, %s)", values)
+        try: 
+            company.execute("insert into assigned_to value(%s, %s, %s, %s)", values)
+            assert company.rowcount
         except Exception as e:
             print(e) 
-            try: company.execute("""update assigned_to
+            try: 
+                company.execute("""update assigned_to
                                  set project_id=%s, assigned_date=%s, end_date=%s
                                  where email_id=%s""", values[1:]+[values[0]])
+                assert company.rowcount
             except Exception as e:
                 print(e)
                 err = True
@@ -685,6 +746,7 @@ def unassign_project(intern_id: str, mentor_id: str):
         info = company.fetchone()
         assert info is not None
         company.execute("delete from assigned_to where email_id=%s", [intern_id])
+        assert company.rowcount
         conn.commit()
     except Exception as e:
         print(e) 
@@ -740,6 +802,7 @@ def set_completed(complete: Complete, mentor_id: str):
         assert info
         company.execute("""insert into is_completed
                         values(%s, %s, %s, %s)""", data)
+        assert company.rowcount
         unassign_roles(complete.email_id)
         conn.commit()
     except Exception as e:
